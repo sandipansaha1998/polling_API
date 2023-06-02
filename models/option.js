@@ -1,28 +1,28 @@
-const  mongoose = require('mongoose');
-
+const mongoose = require("mongoose");
 
 //Schema Definition
 
-const OptionSchema = new mongoose.Schema({
-    title:{
-        type:String,
-        required:true
+const OptionSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
     },
-     question:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Question'
+    question: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Question",
     },
-    votes:{
-        type:Number,
-        default:0
-    }
-},{
-    timestamps:true
-});
 
-
-
+    votes: {
+      type: Number,
+      default: 0,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 //Model Definition
-const options = mongoose.model('Option',OptionSchema);
+const options = mongoose.model("Option", OptionSchema);
 module.exports = options;
