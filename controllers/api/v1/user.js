@@ -1,4 +1,5 @@
 let User = require("../../../models/user");
+let Question = require("../../../models/question");
 let jwt = require("jsonwebtoken");
 // Generates JSON web token on Login attempt
 module.exports.createSession = async function (req, res) {
@@ -120,6 +121,7 @@ module.exports.getIsEmailUnique = async function (req, res) {
 
 //  - if key is present : return its value which is the option id chosen.
 // else return null which indicates that the question was not answered.
+
 module.exports.getUserOption = async (req, res) => {
   // The questionID is contained in the string params and the user in the token
 
@@ -149,6 +151,72 @@ module.exports.getUserOption = async (req, res) => {
     return res.status(200).json({
       message: "User has already voted for this.",
       data: user.votedQuestion.get(`${questionID}`),
+    });
+  }
+};
+
+module.exports.getMypolls = async function (req, res) {
+  // ID of the logged in user
+  try {
+    let user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+    // Finds the questions that the created by requested user
+    let questions = await Question.find({ user: user._id }).populate("user");
+    if (questions.length < 1) {
+      // No polls Found
+      return res.status(200).json({
+        message: "No polls Created",
+      });
+    } else {
+      return res.status(200).json({
+        message: "Polls Found",
+        data: questions,
+      });
+    }
+  } catch (e) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+module.exports.getMyVotes = async function (req, res) {
+  // ID of the logged in user
+  try {
+    let user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+    // Finds the questions that the requested user voted
+    // Collects ids of the question that the user voted
+    const keys = Array.from(user.votedQuestion.keys());
+    let questionsVoted = [];
+    for (let key of keys) {
+      let question = await Question.findById(key).populate("user");
+      if (question) {
+        questionsVoted.push(question);
+      }
+    }
+    console.log(questionsVoted);
+    if (questionsVoted.length < 1) {
+      return res.status(200).json({
+        message: "No polls Voted",
+      });
+    } else {
+      return res.status(200).json({
+        message: "Voted Polls Found",
+        data: questionsVoted,
+      });
+    }
+  } catch (e) {
+    // console.log(e);
+    return res.status(500).json({
+      message: "Internal Server Error",
     });
   }
 };

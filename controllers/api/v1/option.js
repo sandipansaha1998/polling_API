@@ -1,6 +1,7 @@
 const Question = require("../../../models/question");
 const Option = require("../../../models/option");
 const User = require("../../../models/user");
+
 module.exports.create = async function (req, res) {
   try {
     if (!req.params)
@@ -85,12 +86,11 @@ module.exports.delete = async function (req, res) {
 module.exports.addVote = async function (req, res) {
   try {
     // Fetching the user logged in
-    let user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(401).json({
-        message: "Unauthorized",
-      });
+    let user = "";
+    if (req.body.userID) {
+      user = await User.findById(req.body.userID);
     }
+
     // Fetching the option voted for
     let option = await Option.findById(req.params.id);
 
@@ -100,10 +100,12 @@ module.exports.addVote = async function (req, res) {
       });
     }
 
-    user.votedQuestion.set(option.question, option.id);
-    user.save();
-    console.log(user.votedQuestion);
-
+    // if user is logged in then it is added to the users VotedQuestion feild
+    if (user) {
+      user.votedQuestion.set(option.question, option.id);
+      user.save();
+    }
+    // Increamenting vout count by 1
     option.votes += 1;
     option.save();
 

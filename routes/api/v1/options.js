@@ -20,7 +20,7 @@ router.get(
 // Vote for an option
 router.post(
   "/add-vote/:id",
-  passport.authenticate("jwt", { session: false }),
+  // passport.authenticate("jwt", { session: false }),
   options_api.addVote
 );
 

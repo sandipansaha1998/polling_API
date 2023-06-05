@@ -11,4 +11,16 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   user_api.getUserOption
 );
+
+router.get(
+  "/mypolls",
+  passport.authenticate("jwt", { session: false }),
+  user_api.getMypolls
+);
+
+router.get(
+  "/myvotes",
+  passport.authenticate("jwt", { session: false }),
+  user_api.getMyVotes
+);
 module.exports = router;
