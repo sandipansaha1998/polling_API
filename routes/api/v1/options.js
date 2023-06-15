@@ -18,10 +18,6 @@ router.get(
   options_api.delete
 );
 // Vote for an option
-router.post(
-  "/add-vote/:id",
-  // passport.authenticate("jwt", { session: false }),
-  options_api.addVote
-);
+router.post("/add-vote/:id", options_api.addVote);
 
 module.exports = router;

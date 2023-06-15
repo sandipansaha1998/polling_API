@@ -4,7 +4,6 @@ let jwt = require("jsonwebtoken");
 // Generates JSON web token on Login attempt
 module.exports.createSession = async function (req, res) {
   try {
-    console.log(req.body);
     // If email or password is missing
     if (!req.body.email || !req.body.password) {
       return res.status(400).json({
@@ -16,10 +15,10 @@ module.exports.createSession = async function (req, res) {
       email: req.body.email,
       password: req.body.password,
     };
+
     // Finds user with provided email in the data base
     let userData = await User.findOne({ email: user.email });
     // No user found associated with email
-
     if (!userData) {
       return res.status(404).json({
         message: "No user Found.Register to begin",
@@ -34,11 +33,11 @@ module.exports.createSession = async function (req, res) {
       });
     }
     // Identity established . returns the JWT
-    console.log("success");
     userData = await userData.toJSON();
     user = { id: userData._id, name: userData.name, email: userData.email };
-    const token = jwt.sign(user, "quickpoll", {
-      expiresIn: "5000000000000",
+    const token = jwt.sign({ ...user, iat: Date.now() }, "quickpoll", {
+      expiresIn: 86400000,
+      // expiresIn: 5000,
     });
     console.log(token);
     return res.status(200).json({
@@ -94,11 +93,10 @@ module.exports.getIsEmailUnique = async function (req, res) {
   let email = req.query.email;
   if (!email) {
     return res.status(400).json({
-      message: "Email cannot be empty",
+      message: "Bad request Email cannot be empty",
     });
   }
   let user = await User.findOne({ email: email });
-  console.log(user);
   try {
     if (!user) {
       return res.status(200).json({
@@ -139,14 +137,12 @@ module.exports.getUserOption = async (req, res) => {
 
   // No questions found
   if (!user.votedQuestion.get(`${questionID}`)) {
-    console.log("DID NOT VOTE");
     return res.status(200).json({
       message: "User did not vote for this poll",
       data: null,
     });
   } else {
     // user has already voted.Just return the option chosen.
-    console.log(user.votedQuestion.get(`${questionID}`));
 
     return res.status(200).json({
       message: "User has already voted for this.",
@@ -202,7 +198,6 @@ module.exports.getMyVotes = async function (req, res) {
         questionsVoted.push(question);
       }
     }
-    console.log(questionsVoted);
     if (questionsVoted.length < 1) {
       return res.status(200).json({
         message: "No polls Voted",
@@ -214,7 +209,7 @@ module.exports.getMyVotes = async function (req, res) {
       });
     }
   } catch (e) {
-    // console.log(e);
+    console.log(e);
     return res.status(500).json({
       message: "Internal Server Error",
     });

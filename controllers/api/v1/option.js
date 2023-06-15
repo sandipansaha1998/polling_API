@@ -5,21 +5,21 @@ const User = require("../../../models/user");
 module.exports.create = async function (req, res) {
   try {
     if (!req.params)
-      return res.json(400, {
+      return res.status(400).json({
         message: "Bad Request",
       });
     // The question for which the option is to be added
     let question = await Question.findById(req.params.id).populate("options");
     // No question found
     if (question == null)
-      return res.json(400, {
+      return res.status(400).json({
         message: "No question found",
       });
     // Checks if option same title exsists
     let questionJSON = question.toJSON();
     for (ops of questionJSON.options) {
       if (ops.title.match(req.body.title))
-        return res.json(400, {
+        return res.status(400).json({
           message: "Option Exsists",
         });
     }
@@ -28,10 +28,12 @@ module.exports.create = async function (req, res) {
       title: req.body.title,
       question: questionJSON,
     });
+    // Associate the option created with the question
     question.options.push(option);
     question.save();
     questionJSON = question.toJSON();
-    return res.json(200, {
+
+    return res.status(200).json({
       message: "Option created",
       data: {
         question: questionJSON,
@@ -52,7 +54,7 @@ module.exports.delete = async function (req, res) {
       return res.status(400).json({
         message: "No data found",
       });
-
+    // If option has no votes ,then only option can be deleted
     if (option.votes > 0) {
       return res.status(400).json({
         message: "Cannot be deleted.Vote count > 0 ",
@@ -62,7 +64,8 @@ module.exports.delete = async function (req, res) {
     let question_id = option.question;
     // Removes the option from question
     let question = await Question.findOne(question_id);
-    if (question.user !== req.user)
+    // Checks if the delete request is by the authorized user
+    if (!question.user.equals(req.user))
       return res.status(401).json({
         message: "Unauthorized",
       });
@@ -71,7 +74,6 @@ module.exports.delete = async function (req, res) {
     });
     // Deletes the option
     option.deleteOne();
-    console.log(question);
     return res.status(200).json({
       message: "Option Deleted",
     });

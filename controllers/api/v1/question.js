@@ -10,11 +10,19 @@ module.exports.create = async function (req, res) {
     let userID = req.user.id;
     let user = await User.findById(userID);
 
+    // If no user found
     if (!user) {
       return res.status(401).json({
         message: "No user found",
       });
     }
+
+    if (!req.body.title) {
+      return res.status(400).json({
+        message: "Bad Request",
+      });
+    }
+    // Question to be created
     let newQuestion = {
       title: req.body.title,
       user: userID,
@@ -22,14 +30,18 @@ module.exports.create = async function (req, res) {
     // Creates the question
     let question = await Question.create(newQuestion);
     // Creates the options if sent with questions
-    for (let option of req.body.options) {
-      let optn = await Option.create({
-        title: option.value,
-        question: question._id,
-      });
-      question.options.push(optn);
+
+    if (req.body.options) {
+      for (let option of req.body.options) {
+        let optn = await Option.create({
+          title: option,
+          question: question._id,
+        });
+        // Adds the options to questions collection for referance
+        question.options.push(optn);
+      }
+      question.save();
     }
-    question.save();
     return res.status(200).json({
       message: "Question created",
       data: {
@@ -46,7 +58,6 @@ module.exports.create = async function (req, res) {
   }
 };
 // Returns Question populated with user and options
-
 module.exports.get = async function (req, res) {
   try {
     let questionID = req.params.id;
@@ -55,17 +66,19 @@ module.exports.get = async function (req, res) {
       .populate("user");
 
     if (!question) {
-      return res.json(400, {
+      return res.status(400).json({
         message: "No Question Found",
       });
     }
-    return res.json(200, {
+    // question = question.toJSON();
+    // question = {question}
+    return res.status(200).json({
       message: "Question Found",
       data: question,
     });
   } catch (e) {
     console.log(e);
-    return res.json(500, {
+    return res.status(500).json({
       message: {
         message: "Internal Server Error",
       },
@@ -81,7 +94,7 @@ module.exports.delete = async function (req, res) {
       message: "No data Found",
     });
   // Checks if the user requested is the user who created the question
-  if (question.user !== req.user._id) {
+  if (!question.user.equals(req.user.id)) {
     return res.status(401).json({
       message: "Unauthorized",
     });
