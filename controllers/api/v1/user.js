@@ -1,6 +1,8 @@
 let User = require("../../../models/user");
 let Question = require("../../../models/question");
 let jwt = require("jsonwebtoken");
+const env = require("../../../config/enviroment");
+
 // Generates JSON web token on Login attempt
 module.exports.createSession = async function (req, res) {
   try {
@@ -35,7 +37,7 @@ module.exports.createSession = async function (req, res) {
     // Identity established . returns the JWT
     userData = await userData.toJSON();
     user = { id: userData._id, name: userData.name, email: userData.email };
-    const token = jwt.sign({ ...user, iat: Date.now() }, "quickpoll", {
+    const token = jwt.sign({ ...user, iat: Date.now() }, `${env.JWT_key}`, {
       expiresIn: 86400000,
       // expiresIn: 5000,
     });
