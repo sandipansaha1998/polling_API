@@ -1,7 +1,7 @@
 module.exports.poll_result_socket = function (socketServer) {
   let io = require("socket.io")(socketServer, {
     cors: {
-      origin: "https://quick-poll-india.netlify.app/",
+      origin: "https://quick-poll-india.netlify.app",
       methods: ["GET", "POST"],
     },
   });

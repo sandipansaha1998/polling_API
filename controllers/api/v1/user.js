@@ -64,10 +64,11 @@ module.exports.register = async function (req, res) {
         message: "Bad Request",
       });
     }
+    let name = req.body.name === "" ? undefined : req.body.name;
 
     let newUser = {
       email: req.body.email,
-      name: req.body.name,
+      name: name,
       password: req.body.password,
       voted: [],
     };

@@ -1,4 +1,3 @@
-
 # API Documentation
 
 This API allows users to create questions, add options to a question, add votes to an option, and perform other related actions.
@@ -8,7 +7,7 @@ This API allows users to create questions, add options to a question, add votes 
 ## Base URL
 
 ```
-http://polingapi.socialise-india.in/api/v1/
+https://polingapi.socialise-india.in/api/v1/
 ```
 
 ## Authentication
@@ -16,6 +15,7 @@ http://polingapi.socialise-india.in/api/v1/
 #### Sign up
 
 **Request:**
+
 - Method: `POST`
 - Endpoint: `/user/register`
 - Content-Type: `application/json`
@@ -35,21 +35,25 @@ POST /user/register
 ```
 
 **Response:**
- - Status: 200 OK
- - Body: 
-    - `message` (string) :Status message   
-  
-    
- ```
+
+- Status: 200 OK
+- Body:
+  - `message` (string) :Status message
+
+```
 {
-  "message": "User Succesfully Registered"
+ "message": "User Succesfully Registered"
 }
 ```
--------------------
-####  Checks if Email is registered
+
+---
+
+#### Checks if Email is registered
+
 Returns success or failure based on whether the email is unique and not already registered.
 
 **Request:**
+
 - Method: `POST`
 - Endpoint: `/user/register`
 - Content-Type: `application/json`
@@ -57,8 +61,9 @@ Returns success or failure based on whether the email is unique and not already 
   - `email` (string, required): Email to be checked
 
 **Response**
+
 - Body:
-    - `message` : Status Message
+  - `message` : Status Message
   ### Example
 
 ```
@@ -69,13 +74,16 @@ Query Params:
   "email": "example@example.com"
 }
 ```
-```Response Status: 409 CONFLICT```
+
+`Response Status: 409 CONFLICT`
 Response Body:
+
 ```
 {
     "message": "Email already taken"
 }
 ```
+
 ```
 GET user/is-unique?email=dummy@example.com
 
@@ -84,18 +92,23 @@ Query Params:
   "email": "dummy@example.com"
 }
 ```
-```Response Status: 200 OK```
+
+`Response Status: 200 OK`
 Response Body:
+
 ```
 {
     "message": "Email is Unique"
 }
 ```
-----------
+
+---
+
 ## Login
 
-Returns JSON web token if credentials match 
+Returns JSON web token if credentials match
 **Request**
+
 - Method: `POST`
 - Endpoint: `/user/create-session`
 - Content-Type: `application/json`
@@ -104,12 +117,10 @@ Returns JSON web token if credentials match
   - `password` (string,required):Password associated.
   ### Example
 
-
-
 **Response**
-- Body
-    -`token`(string):JSON Web Token for authentication in protected routes
-    
+
+- Body -`token`(string):JSON Web Token for authentication in protected routes
+
 ```
 
 POST /user/create-session
@@ -120,8 +131,10 @@ POST /user/create-session
   "password": "password_dummy"
 }
 ```
-```Resonse Status: 200 OK```
+
+`Resonse Status: 200 OK`
 Response Body:
+
 ```
 {
     "message": "Sign in successful.Token is attached",
@@ -130,15 +143,16 @@ Response Body:
     }
 }
 ```
--------------------
+
+---
 
 ### Create a Question
 
 Create a new question.If options are passed along then options are created and associated
 with the question.
 This is a protected route and requires authenticaiton.Use the JWT as the value in the Authorization key in the headers as
-'Bearer __ token __'
- 
+'Bearer ** token **'
+
 **Request:**
 
 - Method: POST
@@ -148,21 +162,22 @@ This is a protected route and requires authenticaiton.Use the JWT as the value i
   - question (string, required): The text of the question
   - options ([string],optional): Arrays of options associated
 
-
 **Example:**
 
 ```
 POST /questions/create
 ```
+
 Request Body:
 {
-  title:"Who is your favourite footballer"
-  options:["CR7","LM10","SR4"]
+title:"Who is your favourite footballer"
+options:["CR7","LM10","SR4"]
 }
 
 `Status: 200 OK`
 
 **Response**
+
 ```
 {
     "message": "Question created",
@@ -199,12 +214,11 @@ Request Body:
 }
 ```
 
-------
+---
 
 ### Add Options to a Question
 
 Add options to a specific question.Protected API.Needs JWT as Bearer token authentication
-
 
 **Request:**
 
@@ -214,7 +228,7 @@ Add options to a specific question.Protected API.Needs JWT as Bearer token authe
 - Params:
   - `id` (string, required): Id of the question to which the option is to be attached
 - Body :
-    - `title` (string,required):Text associated with the option
+  - `title` (string,required):Text associated with the option
 
 **Example:**
 
@@ -229,7 +243,7 @@ Request Body:
 
 **Response:**
 
- `Status: 200 OK`
+`Status: 200 OK`
 **Example:**
 
 ```
@@ -296,9 +310,8 @@ Anonymous Voting is permitted
 
 - Method: POST
 - Endpoint: `/options/add-vote/:id`
-- Param
-    - option ID
-**Example:**
+- Param - option ID
+  **Example:**
 
 ```
 POST /options/add-vote/saasfas8basd13kasd
@@ -307,6 +320,7 @@ POST /options/add-vote/saasfas8basd13kasd
 **Response:**
 
 `Status: 200 OK`
+
 ```
 {
     "message": "Voted Successfully",
@@ -321,6 +335,7 @@ POST /options/add-vote/saasfas8basd13kasd
     }
 }
 ```
+
 ### Delete a Question
 
 Delete a question. A question cannot be deleted if one of its options has votes.
@@ -331,7 +346,7 @@ Protected Route and only creater can delete the question.
 - Method: DELETE
 - Endpoint: `/questions/delete/:id`
 - Params :
-    - `id` (String): ID of the question to be delted
+  - `id` (String): ID of the question to be delted
 
 **Example:**
 
@@ -342,6 +357,7 @@ DELETE /questions/delete/124237t23234b
 **Response:**
 
 ` Status: 200 OK`
+
 ```
  "message": "Question and associated options deleted successfully"
 ```
@@ -354,8 +370,7 @@ Delete an option. An option cannot be deleted if it has at least one vote.
 
 - Method: DELETE
 - Endpoint: `/options/delete/:id`
-- Params:
-        -  `id`:ID of the option be deleted
+- Params: - `id`:ID of the option be deleted
 
 **Example:**
 
@@ -366,6 +381,7 @@ DELETE /options/delete/qwrnasd78asdlj9
 **Response:**
 
 ` Status: 200 OK`
+
 ```
   message: "Option Deleted"
 ```
@@ -378,9 +394,8 @@ Retrieve a question with its associated options and votes.
 
 - Method: GET
 - Endpoint: `/questions/:id`
-- Params :
-    - `id` : ID of the question
-**Example:**
+- Params : - `id` : ID of the question
+  **Example:**
 
 ```
 GET /questions/asdjbasd083ala12
@@ -388,7 +403,7 @@ GET /questions/asdjbasd083ala12
 
 **Response:**
 
- `Status: 200 OK`
+`Status: 200 OK`
 
 **Example:**
 
@@ -437,30 +452,32 @@ Response Body:
 }
 }
 ```
-------
+
+---
 
 ## User Related
 
 ### Fetch polls user created
+
 This is a protected route and requires valid JWT to return the polls a particular user created.
-***Request***
+**_Request_**
+
 - Method:GET
 - `Endpoint:/user/mypolls`
 
 ### Fetch polls user voted
+
 This is a protected route and requires valid JWT to return the polls a particular user voted.
-***Request***
+**_Request_**
+
 - Method:GET
 - `Endpoint:/user/myvotes`
+
 ### Check if user has already voted for the question
+
 This is a protected route and requires valid JWT to check if a user has already voted for a question.If yes return the option voted for.
-***Request***
+**_Request_**
+
 - Method:GET
 - `Endpoint:/user/getChosenOption/:id`
-- Params:
-        - `id` : ID of the question for which the vote is checked
-  
-
-
-
-
+- Params: - `id` : ID of the question for which the vote is checked
